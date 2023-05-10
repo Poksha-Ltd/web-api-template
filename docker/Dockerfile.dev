@@ -1,0 +1,25 @@
+# ベースイメージ
+FROM openjdk:19-jdk-alpine3.16
+
+ARG SBT_VERSION=1.8.2
+
+# sbtをインストール
+RUN apk add --no-cache curl bash && \
+    curl -L -o sbt-${SBT_VERSION}.zip https://github.com/sbt/sbt/releases/download/v1.8.2/sbt-${SBT_VERSION}.zip && \
+    unzip sbt-${SBT_VERSION}.zip && \
+    rm sbt-${SBT_VERSION}.zip
+
+# アプリケーションのディレクトリを作成
+RUN mkdir -p /app
+
+# ディレクトリを移動
+WORKDIR /app
+
+ENV PATH="${PATH}:/sbt/bin"
+RUN sbt -V
+
+# ポート番号を設定
+EXPOSE 8080
+
+# アプリケーションを実行
+CMD ["sbt", "reStart ; revolver:reStart"]
