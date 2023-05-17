@@ -1,0 +1,33 @@
+{
+	"id": "33d31293-e224-4074-8791-43a0b941ee98",
+	"values": [
+		{
+			"key": "API_URL",
+			"value": "http://localhost:8080",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "authEmail",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "authId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		}
+	],
+	"name": "Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2023-05-17T14:16:52.072Z",
+	"_postman_exported_using": "Postman/10.13.5"
+}
