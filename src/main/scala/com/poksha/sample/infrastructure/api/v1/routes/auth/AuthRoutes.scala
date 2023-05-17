@@ -5,7 +5,7 @@ import cats.implicits._
 import com.poksha.sample.application.auth.AuthServiceInterface
 import com.poksha.sample.application.auth.CreateAuthUserCommand.CreatePasswordUser
 import com.poksha.sample.application.auth.UserAuthenticationCommand.AuthenticateEmailPasswordUser
-import com.poksha.sample.domain.auth.AuthUserRepositoryInterface
+import com.poksha.sample.domain.auth.AuthUserRepository
 import com.poksha.sample.infrastructure.api.v1.middlewares.AuthJWTMiddleware
 import com.poksha.sample.infrastructure.api.v1.models.{AuthUserView, Token}
 import io.circe.generic.auto._
@@ -16,7 +16,7 @@ import org.http4s.circe.CirceEntityDecoder._
 import org.http4s.dsl.io._
 
 
-class AuthRoutes(authService: AuthServiceInterface, authJWTMiddleware: AuthJWTMiddleware)(implicit authUserRepository: AuthUserRepositoryInterface) {
+class AuthRoutes(authService: AuthServiceInterface, authJWTMiddleware: AuthJWTMiddleware)(implicit authUserRepository: AuthUserRepository) {
   private val publicRoutes: HttpRoutes[IO] = HttpRoutes.of[IO] {
     case req @ POST -> Root / "auth" / "signIn" / "emailPassword" =>
       req.as[AuthenticateEmailPasswordUser].flatMap(

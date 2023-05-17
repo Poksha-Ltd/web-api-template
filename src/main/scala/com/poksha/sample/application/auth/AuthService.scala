@@ -1,8 +1,8 @@
 package com.poksha.sample.application.auth
 
-import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserPassword, AuthUserRepositoryInterface}
+import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserPassword, AuthUserRepository}
 
-class AuthService(implicit authUserRepository: AuthUserRepositoryInterface) extends AuthServiceInterface {
+class AuthService(implicit authUserRepository: AuthUserRepository) extends AuthServiceInterface {
   override def create(c: CreateAuthUserCommand): Either[String, AuthUser] = {
     c match {
       case CreateAuthUserCommand.CreatePasswordUser(email, password) =>

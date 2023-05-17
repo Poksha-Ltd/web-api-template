@@ -3,7 +3,7 @@ package com.poksha.sample.infrastructure.api.v1.middlewares
 import cats.data._
 import cats.effect._
 import cats.implicits._
-import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserRepositoryInterface}
+import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserRepository}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.parser
@@ -16,7 +16,7 @@ import pdi.jwt._
 
 import scala.concurrent.duration.DurationInt
 
-class AuthJWTMiddleware(implicit authUserRepository: AuthUserRepositoryInterface) {
+class AuthJWTMiddleware(implicit authUserRepository: AuthUserRepository) {
   private val algo = JwtAlgorithm.HS256
   private val privateKey = "privateKey"  // TODO: move to config
 

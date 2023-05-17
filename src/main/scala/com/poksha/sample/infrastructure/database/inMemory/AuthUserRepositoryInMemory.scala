@@ -1,10 +1,10 @@
 package com.poksha.sample.infrastructure.database.inMemory
 
-import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserRepositoryInterface}
+import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserRepository}
 
 import scala.collection.mutable
 
-object AuthUserRepositoryImpl extends AuthUserRepositoryInterface {
+object AuthUserRepositoryInMemory extends AuthUserRepository {
   private val storage = mutable.Map.empty[AuthUserId, AuthUser]
 
   override def find(id: AuthUserId): Option[AuthUser] = storage.get(id)

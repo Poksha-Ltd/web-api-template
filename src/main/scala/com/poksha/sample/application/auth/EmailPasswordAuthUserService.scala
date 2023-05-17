@@ -1,8 +1,8 @@
 package com.poksha.sample.application.auth
 
-import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserPassword, AuthUserRepositoryInterface}
+import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserPassword, AuthUserRepository}
 
-class EmailPasswordAuthUserService(implicit authUserRepository: AuthUserRepositoryInterface) {
+class EmailPasswordAuthUserService(implicit authUserRepository: AuthUserRepository) {
   def updatePassword(c: UpdateAuthPasswordCommand): Either[String, AuthUser] = {
     val id = AuthUserId.fromString(c.id)
     authUserRepository.find(id) match {
