@@ -3,8 +3,9 @@ package com.poksha.sample.infrastructure.api
 import cats.effect._
 import com.comcast.ip4s._
 import com.poksha.sample.application.auth.AuthService
+import com.poksha.sample.domain.auth.AuthUserRepository
 import com.poksha.sample.infrastructure.api.v1.routes.V1Routes
-import com.poksha.sample.infrastructure.database.inMemory.AuthUserRepositoryImpl
+import com.poksha.sample.infrastructure.database.inMemory.AuthUserRepositoryInMemory
 import org.http4s.HttpRoutes
 import org.http4s.dsl.io._
 import org.http4s.ember.server._
@@ -16,8 +17,11 @@ object Main extends IOApp {
     case GET -> Root =>
       Ok(s"Sample API")
   }
-  val authService = new AuthService()(AuthUserRepositoryImpl)
-  private val v1Routes = V1Routes.routes(authService)(AuthUserRepositoryImpl)
+
+  implicit val authUserRepository:AuthUserRepository = AuthUserRepositoryInMemory
+
+  val authService = new AuthService
+  private val v1Routes = V1Routes.routes(authService)
   private val httpApp = Router("/" -> rootService, "/v1" -> v1Routes).orNotFound
   def run(args: List[String]): IO[ExitCode] =
     EmberServerBuilder.default[IO]
