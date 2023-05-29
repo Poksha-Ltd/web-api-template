@@ -1,7 +1,10 @@
-name: Run sbt test on push to main branch
+name: Run sbt test
 # TODO ブランチ戦略次第でトリガーとなるブランチを変更する
 
 on:
+  pull_request:
+    types:
+      - opened
   push:
     branches:
       - main
