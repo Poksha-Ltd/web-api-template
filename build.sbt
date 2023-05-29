@@ -23,13 +23,18 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "com.github.jwt-scala" %% "jwt-circe" % "9.2.0"
 
+val scalatest = "org.scalatest" %% "scalatest" % "3.2.16" % "test"
+
 lazy val root = (project in file("."))
   .enablePlugins(JavaAppPackaging, RevolverPlugin)
   .settings(
     fork / run := true
   )
   .settings(
-    name := "sample"
+    name := "sample",
+    libraryDependencies ++= Seq(
+      scalatest,
+    ),
   )
 
 Revolver.enableDebugging(port = 5005, suspend = false)
