@@ -5,9 +5,14 @@ on:
   pull_request:
     types:
       - opened
+      - synchronize
+    paths:
+      - 'src/**'
   push:
     branches:
       - main
+    paths:
+      - 'src/**'
 
 jobs:
   deploy:
