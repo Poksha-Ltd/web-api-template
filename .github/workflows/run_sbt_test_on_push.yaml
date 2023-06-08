@@ -1,0 +1,28 @@
+name: Run sbt test
+# TODO ブランチ戦略次第でトリガーとなるブランチを変更する
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    paths:
+      - 'src/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+
+jobs:
+  deploy:
+    name: Run sbt test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Run sbt test 
+        id: run-sbt-test
+        run: |
+          sbt test
