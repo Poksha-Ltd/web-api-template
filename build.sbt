@@ -12,13 +12,12 @@ libraryDependencies += "org.slf4j" % "slf4j-api" % "2.0.7"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.7"
 
-
 val http4sVersion = "0.23.18"
 
 libraryDependencies ++= Seq(
   "org.http4s" %% "http4s-ember-client" % http4sVersion,
   "org.http4s" %% "http4s-ember-server" % http4sVersion,
-  "org.http4s" %% "http4s-dsl"          % http4sVersion,
+  "org.http4s" %% "http4s-dsl" % http4sVersion
 )
 
 libraryDependencies += "com.github.jwt-scala" %% "jwt-circe" % "9.2.0"
@@ -33,8 +32,8 @@ lazy val root = (project in file("."))
   .settings(
     name := "sample",
     libraryDependencies ++= Seq(
-      scalatest,
-    ),
+      scalatest
+    )
   )
 
 Revolver.enableDebugging(port = 5005, suspend = false)
@@ -50,4 +49,16 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-literal" % "0.14.5"
 )
 
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+addCompilerPlugin(
+  "org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full
+)
+
+lazy val doobieVersion = "1.0.0-RC1"
+
+libraryDependencies ++= Seq(
+  "org.tpolecat" %% "doobie-core" % doobieVersion,
+  "org.tpolecat" %% "doobie-postgres" % doobieVersion,
+  "org.tpolecat" %% "doobie-specs2" % doobieVersion
+)
+
+libraryDependencies += "com.typesafe" % "config" % "1.4.2"
