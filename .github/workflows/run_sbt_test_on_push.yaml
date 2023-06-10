@@ -24,7 +24,7 @@ jobs:
 
       - name: Start database by docker compose up
         run: |
-          docker compose -f docker-compose.dev.yml up db
+          docker compose -f docker-compose.dev.yml up db -d
 
       - name: Wait on database
         run: |
