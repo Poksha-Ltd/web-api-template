@@ -1,37 +1,24 @@
 package com.poksha.sample.infrastructure.database.postgres
 
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserRepository}
 import doobie.implicits.toSqlInterpolator
 import doobie.util.transactor.Transactor
 import doobie.implicits._
 import com.poksha.sample.domain.auth.AuthUser.EmailPasswordAuthUser
 
-case class PostgresConfig private (
-    driver: String,
-    url: String,
-    user: String,
-    pass: String
-)
-object PostgresConfig {
-  def apply(
-      driver: String = "org.postgresql.Driver",
-      url: String = "jdbc:postgresql:authentication",
-      user: String = "postgres",
-      pass: String = "password"
-  ): PostgresConfig = {
-    new PostgresConfig(
-      driver,
-      url,
-      user,
-      pass
-    )
-  }
+case class AuthUserDataModel(
+    id: String,
+    email: String,
+    hashedPassword: String
+) {
+  def toDomain: EmailPasswordAuthUser =
+    EmailPasswordAuthUser(id, email, hashedPassword)
 }
 
 case class AuthUserRepositoryPostgres(config: PostgresConfig)
     extends AuthUserRepository {
-  import cats.effect.unsafe.implicits.global
 
   private val transActor = Transactor.fromDriverManager[IO](
     driver = config.driver,
@@ -50,10 +37,8 @@ case class AuthUserRepositoryPostgres(config: PostgresConfig)
         WHERE 
           id = ${id.value.toString}
        """
-      .query[(String, String, String)]
-      .map { case (id, email, pass) =>
-        EmailPasswordAuthUser(AuthUserId.fromString(id), email, pass)
-      }
+      .query[AuthUserDataModel]
+      .map(_.toDomain)
       .option
       .transact(transActor)
       .unsafeRunSync()
@@ -69,10 +54,8 @@ case class AuthUserRepositoryPostgres(config: PostgresConfig)
         WHERE 
           email = $email
        """
-      .query[(String, String, String)]
-      .map { case (id, email, pass) =>
-        EmailPasswordAuthUser(AuthUserId.fromString(id), email, pass)
-      }
+      .query[AuthUserDataModel]
+      .map(_.toDomain)
       .option
       .transact(transActor)
       .unsafeRunSync()
