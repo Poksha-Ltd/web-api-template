@@ -21,7 +21,7 @@ class EmailPasswordAuthRoutes(authJWTMiddleware: AuthJWTMiddleware)(implicit
     case req @ PATCH -> Root / "auth" / "users" / userId / "password" as user =>
       val authUserId = AuthUserId.fromString(userId)
       if (user.getId != authUserId) {
-        Forbidden("You can only change your own password")
+        forbidden("You can only change your own password")
       } else {
         req.req.as[UpdateAuthPasswordCommand].flatMap { com =>
           new EmailPasswordAuthUserService()

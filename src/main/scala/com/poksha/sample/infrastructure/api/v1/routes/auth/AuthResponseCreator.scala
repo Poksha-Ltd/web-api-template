@@ -31,4 +31,11 @@ trait AuthResponseCreator {
       .pipe(error => FailureView(error))
       .pipe(BadRequest(_))
   }
+
+  def forbidden(msg: String): IO[Response[IO]] = {
+    ViewError
+      .fromApplicationError(msg)
+      .pipe(error => FailureView(error))
+      .pipe(Forbidden(_))
+  }
 }

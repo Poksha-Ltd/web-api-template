@@ -72,7 +72,9 @@ case class AuthUserRepositoryPostgres(config: PostgresConfig)
           ${emailPasswordAuthUser.id.value.toString},
           ${emailPasswordAuthUser.email},
           ${emailPasswordAuthUser.hashedPassword}
-        )
+        ) ON CONFLICT (
+          id
+        ) DO UPDATE SET hashed_password=${emailPasswordAuthUser.hashedPassword}
       """.update.run.attemptSql
       .transact(transActor)
       .map {
