@@ -1,6 +1,7 @@
 package com.poksha.sample.infrastructure.api.v1.routes.auth
 
 import cats.effect._
+import com.poksha.sample.application.auth.AuthApplicationError
 import com.poksha.sample.domain.auth.AuthUser
 import com.poksha.sample.infrastructure.api.v1.models.ResponseView.{
   FailureView,
@@ -25,16 +26,18 @@ trait AuthResponseCreator {
       .pipe(success => Ok(success))
   }
 
-  def badRequest(msg: String): IO[Response[IO]] = {
+  def badRequest(err: AuthApplicationError): IO[Response[IO]] = {
     ViewError
-      .fromApplicationError(msg)
+      .fromApplicationError(err)
+      .tap(e => println(s"BadRequest by $e")) // TODO Logger を使う
       .pipe(error => FailureView(error))
       .pipe(BadRequest(_))
   }
 
-  def forbidden(msg: String): IO[Response[IO]] = {
-    ViewError
-      .fromApplicationError(msg)
+  // TODO これだけ抽象度が異なるのでリファクタリングを行う
+  def forbidden(err: String): IO[Response[IO]] = {
+    ViewError.OtherError
+      .tap(_ => println(s"Forbidden by $err")) // TODO Logger を使う
       .pipe(error => FailureView(error))
       .pipe(Forbidden(_))
   }

@@ -1,5 +1,8 @@
 package com.poksha.sample.infrastructure.api.v1.models
 
+import com.poksha.sample.application.auth.AuthApplicationError
+import com.poksha.sample.application.auth.{AuthApplicationError => AppError}
+
 /** API Response Error
   */
 sealed class ViewError(val code: Int, val msg: String)
@@ -12,15 +15,12 @@ object ViewError {
 
   case object OtherError extends ViewError(999, "Unknown Error")
 
-  // TODO アプリケーションで発生したエラーをビューのエラーに変換する
-  //  アプリケーションエラーの型を定義したら String をその型に置き換える
-  type ApplicationError = String
-  def fromApplicationError(msg: ApplicationError): ViewError = {
-    msg match {
-      case "User already exists" => AlreadyRegistered
-      case "Invalid password"    => AuthenticationFailed
-      case "User not found"      => UserNotFound
-      case _                     => OtherError
+  def fromApplicationError(err: AuthApplicationError): ViewError = {
+    err match {
+      case AppError.UserAlreadyExists       => AlreadyRegistered
+      case AppError.WrongPassword           => AuthenticationFailed
+      case AppError.UserNotFound            => UserNotFound
+      case AppError.UnknownApplicationError => OtherError
     }
   }
 }
