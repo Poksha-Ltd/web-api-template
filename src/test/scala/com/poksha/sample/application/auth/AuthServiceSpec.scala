@@ -24,7 +24,7 @@ class AuthServiceSpec
         val sut = new AuthService
 
         val actual =
-          sut.create(CreatePasswordUser(registeredEmail, registeredPass))
+          sut.create(CreatePasswordUser(dummyEmail, dummyPass))
 
         actual shouldBe Left(UserAlreadyExists)
       }
@@ -39,7 +39,7 @@ class AuthServiceSpec
             )
           val sut = new AuthService
 
-          val actual = sut.create(CreatePasswordUser("dummyEmail", "dummy"))
+          val actual = sut.create(CreatePasswordUser(dummyEmail, dummyPass))
 
           actual shouldBe Left(UnknownApplicationError)
         }
@@ -47,8 +47,8 @@ class AuthServiceSpec
 
       "and save to storage is succeeded " - {
         "should return created user" in {
-          val email = "dummyEmail"
-          val password = "dummyPass"
+          val email = dummyEmail
+          val password = dummyPass
           val authedUser = dummyAuthedUser(email, password)
           implicit val authUserRepository: AuthUserRepository =
             mockAuthUserRepository(
@@ -70,8 +70,8 @@ class AuthServiceSpec
     "when the user email is already registered" - {
       "and password is correct" - {
         "should return authed user" in {
-          val email = "dummyEmail"
-          val password = "dummyPass"
+          val email = dummyEmail
+          val password = dummyPass
           val authedUser = dummyAuthedUser(email, password)
           implicit val authUserRepository: AuthUserRepository =
             mockAuthUserRepository(findByEmailF = _ => Some(authedUser))
@@ -86,8 +86,8 @@ class AuthServiceSpec
 
       "and password is wrong" - {
         "should return password is invalid" in {
-          val email = "dummyEmail"
-          val password = "dummyPass"
+          val email = dummyEmail
+          val password = dummyPass
           val authedUser = dummyAuthedUser(email, password)
           implicit val authUserRepository: AuthUserRepository =
             mockAuthUserRepository(findByEmailF = _ => Some(authedUser))
@@ -108,9 +108,7 @@ class AuthServiceSpec
         val sut = new AuthService
 
         val actual =
-          sut.authenticate(
-            AuthenticateEmailPasswordUser("dummyEmail", "dummyPass")
-          )
+          sut.authenticate(AuthenticateEmailPasswordUser(dummyEmail, dummyPass))
 
         actual shouldBe Left(UserNotFound)
       }
@@ -121,10 +119,8 @@ class AuthServiceSpec
 /** AuthServiceSpec に必要な要素を定義するためのベース trait
   */
 sealed trait AuthServiceSpecBase {
-  val registeredEmail = "userEmail"
-  val registeredPass = "userPass"
-
-  val unregisteredEmail = "unregisteredEmail"
+  val dummyEmail = "email"
+  val dummyPass = "pass"
 
   // FIXME モックを作るライブラリを使うことで分かりやすくなるなら、ライブラリの導入を検討する
   def mockAuthUserRepository(
@@ -143,8 +139,8 @@ sealed trait AuthServiceSpecBase {
   }
 
   def dummyAuthedUser(
-      email: String,
-      password: String
+      email: String = dummyEmail,
+      password: String = dummyPass
   ): EmailPasswordAuthUser = {
     import com.poksha.sample.domain.auth.AuthUserPassword
     AuthUser.EmailPasswordAuthUser(
