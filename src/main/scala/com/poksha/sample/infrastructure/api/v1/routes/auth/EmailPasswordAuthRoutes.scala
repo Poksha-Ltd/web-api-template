@@ -27,7 +27,7 @@ class EmailPasswordAuthRoutes(authJWTMiddleware: AuthJWTMiddleware)(implicit
           new EmailPasswordAuthUserService()
             .updatePassword(com)
             .fold(
-              error => badRequest(error),
+              error => badRequest(???),
               user => ok(user, Token(authJWTMiddleware.generateToken(user)))
             )
         }
