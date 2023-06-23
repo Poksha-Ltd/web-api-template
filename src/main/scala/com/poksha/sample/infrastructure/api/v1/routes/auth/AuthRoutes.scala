@@ -24,25 +24,24 @@ class AuthRoutes(
       req
         .as[AuthenticateEmailPasswordUser]
         .flatMap(c =>
-          authService.authenticate(c) match {
-            case Right(user) =>
-              ok(user, Token(authJWTMiddleware.generateToken(user)))
-            case Left(msg) => badRequest(msg)
-          }
+          authService
+            .authenticate(c)
+            .fold(
+              err => badRequest(err),
+              user => ok(user, Token(authJWTMiddleware.generateToken(user)))
+            )
         )
 
     case req @ POST -> Root / "auth" / "signUp" / "emailPassword" =>
       req
         .as[CreatePasswordUser]
         .flatMap { c =>
-          authService.create(c) match {
-            case Right(createdUser) =>
-              ok(
-                createdUser,
-                Token(authJWTMiddleware.generateToken(createdUser))
-              )
-            case Left(msg) => badRequest(msg)
-          }
+          authService
+            .create(c)
+            .fold(
+              err => badRequest(err),
+              user => ok(user, Token(authJWTMiddleware.generateToken(user)))
+            )
         }
   }
 
