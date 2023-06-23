@@ -27,7 +27,7 @@ class AuthRoutes(
           authService
             .authenticate(c)
             .fold(
-              err => badRequest(err),
+              err => badRequest(???),
               user => ok(user, Token(authJWTMiddleware.generateToken(user)))
             )
         )
@@ -39,7 +39,7 @@ class AuthRoutes(
           authService
             .create(c)
             .fold(
-              err => badRequest(err),
+              err => badRequest(???),
               user => ok(user, Token(authJWTMiddleware.generateToken(user)))
             )
         }
