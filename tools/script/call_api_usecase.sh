@@ -1,4 +1,5 @@
-#! /bin/bash -e
+#! /bin/bash
+set -e
 
 # テスト用のメールアドレスを UNIXTIME で生成
 DUMMY_EMAIL=$(date -j +%s)
