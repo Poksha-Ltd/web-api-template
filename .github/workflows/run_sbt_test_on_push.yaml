@@ -14,6 +14,10 @@ on:
     paths:
       - 'src/**'
 
+env:
+  POSTGRES_CACHE_PATH: postgres-image
+  POSTGRES_VERSION: 15-alpine
+
 jobs:
   deploy:
     name: Run sbt test
@@ -22,9 +26,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Cache a Postgres Docker image
+        id: cache-postgres
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.POSTGRES_CACHE_PATH }}
+          key: ${{ runner.os }}-postgres-${{ env.POSTGRES_VERSION }}
+
+      - name: Pull and save a Postgres Docker image
+        if: steps.cache-postgres.outputs.cache-hit != 'true'
+        run: |
+          docker pull postgres:${{ env.POSTGRES_VERSION }} 
+          docker save postgres:${{ env.POSTGRES_VERSION }} -o ${{ env.POSTGRES_CACHE_PATH }}
+
+      - name: Load docker iamge
+        run: docker load -i ${{ env.POSTGRES_CACHE_PATH }}
+      
       - name: Start database by docker compose up
         run: |
           docker compose -f docker-compose.dev.yml up db -d
+
+      - name: Set up java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'sbt'
 
       - name: Run sbt test 
         id: run-sbt-test
