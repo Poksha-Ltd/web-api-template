@@ -7,6 +7,7 @@ import doobie.implicits.toSqlInterpolator
 import doobie.util.transactor.Transactor
 import doobie.implicits._
 import com.poksha.sample.domain.auth.AuthUser.EmailPasswordAuthUser
+import org.slf4j.LoggerFactory
 
 case class AuthUserDataModel(
     id: String,
@@ -19,6 +20,8 @@ case class AuthUserDataModel(
 
 case class AuthUserRepositoryPostgres(config: PostgresConfig)
     extends AuthUserRepository {
+
+  private val logger = LoggerFactory.getLogger(this.getClass.getName)
 
   private val transActor = Transactor.fromDriverManager[IO](
     driver = config.driver,
@@ -41,6 +44,7 @@ case class AuthUserRepositoryPostgres(config: PostgresConfig)
       .map(_.toDomain)
       .option
       .transact(transActor)
+      .handleErrorWith(err => IO.pure(handleException(err, None)))
       .unsafeRunSync()
   }
 
@@ -58,6 +62,7 @@ case class AuthUserRepositoryPostgres(config: PostgresConfig)
       .map(_.toDomain)
       .option
       .transact(transActor)
+      .handleErrorWith(err => IO.pure(handleException(err, None)))
       .unsafeRunSync()
   }
 
@@ -78,9 +83,21 @@ case class AuthUserRepositoryPostgres(config: PostgresConfig)
       """.update.run.attemptSql
       .transact(transActor)
       .map {
+        case Left(e) =>
+          // TODO 適切なExceptionに変換する
+          Left(
+            handleException(e, s"Update error by $e")
+          )
         case Right(_) => Right(user)
-        case Left(e)  => throw new RuntimeException(e) // TODO 適切なExceptionに変換する
       }
       .unsafeRunSync()
+  }
+
+  private def handleException[ResultType](
+      throwable: Throwable,
+      recoveryValue: ResultType
+  ): ResultType = {
+    logger.error(s"Repository error by $throwable")
+    recoveryValue
   }
 }
