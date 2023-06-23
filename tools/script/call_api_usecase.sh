@@ -11,7 +11,7 @@ echo "signUp user [$USER_ID] is success!!!"
 
 
 echo '===check signUp result is UserAlreadyExists when user is already registered==='
-curl -s -X POST -H "Content-Type: application/json" -d "{\"email\":\"$DUMMY_EMAIL\", \"password\":\"1111\"}" "localhost:8080/v1/auth/signUp/emailPassword" | jq ".message"
+curl -s -X POST -H "Content-Type: application/json" -d "{\"email\":\"$DUMMY_EMAIL\", \"password\":\"1111\"}" "localhost:8080/v1/auth/signUp/emailPassword" | jq
 
 
 echo '===check signIn result is success==='
@@ -21,15 +21,15 @@ echo "signIn user [$USER_ID] success!!!"
 
 
 echo '===check signIn result is AuthenticationFailed when password is wrong==='
-curl -s -X POST -H "Content-Type: application/json" -d "{\"email\":\"$DUMMY_EMAIL\", \"password\":\"9999\"}" localhost:8080/v1/auth/signIn/emailPassword | jq ".message"
+curl -s -X POST -H "Content-Type: application/json" -d "{\"email\":\"$DUMMY_EMAIL\", \"password\":\"9999\"}" localhost:8080/v1/auth/signIn/emailPassword | jq
 
 
 echo '===check signIn result is UserNotFound when email is not registered==='
-curl -s -X POST -H "Content-Type: application/json" -d "{\"email\":\"UserNotFound\", \"password\":\"1111\"}" localhost:8080/v1/auth/signIn/emailPassword | jq ".message"
+curl -s -X POST -H "Content-Type: application/json" -d "{\"email\":\"UserNotFound\", \"password\":\"1111\"}" localhost:8080/v1/auth/signIn/emailPassword | jq
 
 
 echo '===check updating password is success==='
-curl -s -X PATCH -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" localhost:8080/v1/auth/users/$USER_ID/password -d "{\"id\": \"$USER_ID\",\"password\": \"9999\"}" | jq ".message"
+curl -s -X PATCH -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" localhost:8080/v1/auth/users/$USER_ID/password -d "{\"id\": \"$USER_ID\",\"password\": \"9999\"}" | jq
 
 
 echo "===check signIn result is success when updated password is used==="
