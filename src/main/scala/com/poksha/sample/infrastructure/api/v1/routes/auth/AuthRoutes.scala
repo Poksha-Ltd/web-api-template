@@ -7,7 +7,11 @@ import com.poksha.sample.application.auth.CreateAuthUserCommand.CreatePasswordUs
 import com.poksha.sample.application.auth.UserAuthenticationCommand.AuthenticateEmailPasswordUser
 import com.poksha.sample.domain.auth.AuthUserRepository
 import com.poksha.sample.infrastructure.api.v1.middlewares.AuthJWTMiddleware
-import com.poksha.sample.infrastructure.api.v1.models.Token
+import com.poksha.sample.infrastructure.api.v1.models.{
+  AuthUserView,
+  Token,
+  ViewError
+}
 import io.circe.generic.auto._
 import org.http4s.HttpRoutes
 import org.http4s.Method.POST
@@ -27,8 +31,14 @@ class AuthRoutes(
           authService
             .authenticate(c)
             .fold(
-              err => badRequest(err),
-              user => ok(user, Token(authJWTMiddleware.generateToken(user)))
+              err => ng(ViewError.fromApplicationError(err)),
+              user =>
+                ok(
+                  AuthUserView(
+                    user,
+                    Token(authJWTMiddleware.generateToken(user))
+                  )
+                )
             )
         )
 
@@ -39,8 +49,14 @@ class AuthRoutes(
           authService
             .create(c)
             .fold(
-              err => badRequest(err),
-              user => ok(user, Token(authJWTMiddleware.generateToken(user)))
+              err => ng(ViewError.fromApplicationError(err)),
+              user =>
+                ok(
+                  AuthUserView(
+                    user,
+                    Token(authJWTMiddleware.generateToken(user))
+                  )
+                )
             )
         }
   }
