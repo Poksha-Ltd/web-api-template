@@ -1,6 +1,7 @@
 package com.poksha.sample.application.auth
 
 import com.poksha.sample.application.auth.AuthApplicationError._
+import com.poksha.sample.application.auth.EmailPasswordAuthUserServiceCommand.UpdateAuthPasswordCommand
 import com.poksha.sample.domain.auth.{
   AuthUser,
   AuthUserId,
@@ -37,4 +38,8 @@ class EmailPasswordAuthUserService(implicit
       case None => Left(UserNotFound)
     }
   }
+}
+
+object EmailPasswordAuthUserServiceCommand {
+  case class UpdateAuthPasswordCommand(id: String, password: String)
 }

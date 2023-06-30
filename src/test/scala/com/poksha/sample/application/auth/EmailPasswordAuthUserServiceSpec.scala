@@ -1,8 +1,7 @@
 package com.poksha.sample.application.auth
 
 import com.poksha.sample.application.auth.AuthApplicationError._
-import com.poksha.sample.application.auth.CreateAuthUserCommand._
-import com.poksha.sample.application.auth.UserAuthenticationCommand.AuthenticateEmailPasswordUser
+import com.poksha.sample.application.auth.EmailPasswordAuthUserServiceCommand.UpdateAuthPasswordCommand
 import com.poksha.sample.domain.auth.{AuthUserPassword, AuthUserRepository}
 import org.scalatest.EitherValues
 import org.scalatest.freespec.AnyFreeSpec

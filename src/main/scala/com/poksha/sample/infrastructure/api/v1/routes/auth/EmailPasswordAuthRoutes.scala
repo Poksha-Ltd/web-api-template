@@ -1,10 +1,8 @@
 package com.poksha.sample.infrastructure.api.v1.routes.auth
 
 import cats.effect._
-import com.poksha.sample.application.auth.{
-  EmailPasswordAuthUserService,
-  UpdateAuthPasswordCommand
-}
+import com.poksha.sample.application.auth.EmailPasswordAuthUserServiceCommand.UpdateAuthPasswordCommand
+import com.poksha.sample.application.auth.EmailPasswordAuthUserService
 import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserRepository}
 import com.poksha.sample.infrastructure.api.v1.middlewares.AuthJWTMiddleware
 import com.poksha.sample.infrastructure.api.v1.models.{
