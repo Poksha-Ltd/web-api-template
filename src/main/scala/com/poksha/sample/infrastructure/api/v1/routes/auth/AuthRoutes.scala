@@ -2,7 +2,7 @@ package com.poksha.sample.infrastructure.api.v1.routes.auth
 
 import cats.effect._
 import cats.implicits._
-import com.poksha.sample.application.auth.AuthServiceInterface
+import com.poksha.sample.application.auth.AuthService
 import com.poksha.sample.application.auth.CreateAuthUserCommand.CreatePasswordUser
 import com.poksha.sample.application.auth.UserAuthenticationCommand.AuthenticateEmailPasswordUser
 import com.poksha.sample.domain.auth.AuthUserRepository
@@ -19,7 +19,7 @@ import org.http4s.circe.CirceEntityDecoder._
 import org.http4s.dsl.io._
 
 class AuthRoutes(
-    authService: AuthServiceInterface,
+    authService: AuthService,
     authJWT: AuthJWTMiddleware
 )(implicit authUserRepository: AuthUserRepository)
     extends AuthResponseCreator {

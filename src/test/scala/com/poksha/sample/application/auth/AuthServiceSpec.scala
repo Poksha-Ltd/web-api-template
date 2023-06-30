@@ -20,7 +20,7 @@ class AuthServiceSpec
           mockAuthUserRepository(
             findByEmailF = email => Some(dummyAuthedUser(email, "dummy"))
           )
-        val sut = new AuthService
+        val sut = new AuthServiceImpl
 
         val actual =
           sut.create(CreatePasswordUser(dummyEmail, dummyPass))
@@ -36,7 +36,7 @@ class AuthServiceSpec
               findByEmailF = _ => None,
               saveF = _ => Left("saveF error")
             )
-          val sut = new AuthService
+          val sut = new AuthServiceImpl
 
           val actual = sut.create(CreatePasswordUser(dummyEmail, dummyPass))
 
@@ -54,7 +54,7 @@ class AuthServiceSpec
               findByEmailF = _ => None,
               saveF = _ => Right(authedUser)
             )
-          val sut = new AuthService
+          val sut = new AuthServiceImpl
 
           val actual =
             sut.create(CreatePasswordUser(email, password))
@@ -74,7 +74,7 @@ class AuthServiceSpec
           val authedUser = dummyAuthedUser(email, password)
           implicit val authUserRepository: AuthUserRepository =
             mockAuthUserRepository(findByEmailF = _ => Some(authedUser))
-          val sut = new AuthService
+          val sut = new AuthServiceImpl
 
           val actual =
             sut.authenticate(AuthenticateEmailPasswordUser(email, password))
@@ -90,7 +90,7 @@ class AuthServiceSpec
           val authedUser = dummyAuthedUser(email, password)
           implicit val authUserRepository: AuthUserRepository =
             mockAuthUserRepository(findByEmailF = _ => Some(authedUser))
-          val sut = new AuthService
+          val sut = new AuthServiceImpl
 
           val actual =
             sut.authenticate(AuthenticateEmailPasswordUser(email, "wrongPass"))
@@ -104,7 +104,7 @@ class AuthServiceSpec
       "should return user not found error" in {
         implicit val authUserRepository: AuthUserRepository =
           mockAuthUserRepository(findByEmailF = _ => None)
-        val sut = new AuthService
+        val sut = new AuthServiceImpl
 
         val actual =
           sut.authenticate(AuthenticateEmailPasswordUser(dummyEmail, dummyPass))

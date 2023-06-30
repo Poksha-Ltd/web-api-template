@@ -1,6 +1,11 @@
 package com.poksha.sample.application.auth
 
-import com.poksha.sample.application.auth.AuthApplicationError._
+import com.poksha.sample.application.auth.AuthApplicationError.{
+  UnknownApplicationError,
+  UserAlreadyExists,
+  UserNotFound,
+  WrongPassword
+}
 import com.poksha.sample.domain.auth.{
   AuthUser,
   AuthUserId,
@@ -8,8 +13,15 @@ import com.poksha.sample.domain.auth.{
   AuthUserRepository
 }
 
-class AuthService(implicit authUserRepository: AuthUserRepository)
-    extends AuthServiceInterface {
+trait AuthService {
+  def create(c: CreateAuthUserCommand): Either[AuthApplicationError, AuthUserId]
+  def authenticate(
+      c: UserAuthenticationCommand
+  ): Either[AuthApplicationError, AuthUserId]
+}
+
+class AuthServiceImpl(implicit authUserRepository: AuthUserRepository)
+    extends AuthService {
   override def create(
       c: CreateAuthUserCommand
   ): Either[AuthApplicationError, AuthUserId] = {
