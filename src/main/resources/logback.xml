@@ -10,8 +10,14 @@
 
     <!-- 標準出力用の設定 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level]: %logger{36} - %msg%n</pattern>
+        <!-- ワンライナーのログ出力設定 -->
+        <!--        <encoder>-->
+        <!--            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level]: %logger{36} - %msg%n</pattern>-->
+        <!--        </encoder>-->
+        <!-- JSON形式で出力するエンコーダー -->
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- JSONを見やすく整形してくれる設定 標準出力だけ見やすくしておく -->
+            <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
         </encoder>
     </appender>
 
@@ -22,12 +28,11 @@
             <fileNamePattern>${LOG_DIR}/web_%d{yyyy-MM-dd_HH-mm}.log</fileNamePattern>
             <maxHistory>5</maxHistory>
             <!-- 1日ごとにローテーションし、14ファイルを保持する設定 -->
-<!--            <fileNamePattern>${LOG_DIR}/web_%d{yyyy-MM-dd}.log</fileNamePattern> -->
-<!--            <maxHistory>14</maxHistory>-->
+            <!--            <fileNamePattern>${LOG_DIR}/web_%d{yyyy-MM-dd}.log</fileNamePattern> -->
+            <!--            <maxHistory>14</maxHistory>-->
         </rollingPolicy>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level]: %logger{36} - %msg%n</pattern>
-        </encoder>
+        <!-- JSON形式で出力するエンコーダー -->
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
     <root level="${LOG_LEVEL}">
