@@ -13,7 +13,7 @@ class EmailPasswordAuthUserService(implicit
 ) {
   def updatePassword(
       c: UpdateAuthPasswordCommand
-  ): Either[AuthApplicationError, AuthUser] = {
+  ): Either[AuthApplicationError, AuthUserId] = {
     val id = AuthUserId.fromString(c.id)
     authUserRepository.find(id) match {
       case Some(user) =>
@@ -31,7 +31,7 @@ class EmailPasswordAuthUserService(implicit
                   println(s"Fail to save by $err") // TODO Loggerに変更する
                   Left(UnknownApplicationError)
                 },
-                updated => Right(updated)
+                updated => Right(updated.getId)
               )
         }
       case None => Left(UserNotFound)

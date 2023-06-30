@@ -12,7 +12,7 @@ class AuthService(implicit authUserRepository: AuthUserRepository)
     extends AuthServiceInterface {
   override def create(
       c: CreateAuthUserCommand
-  ): Either[AuthApplicationError, AuthUser] = {
+  ): Either[AuthApplicationError, AuthUserId] = {
     c match {
       case CreateAuthUserCommand.CreatePasswordUser(email, password) =>
         authUserRepository.findByEmail(email) match {
@@ -30,14 +30,14 @@ class AuthService(implicit authUserRepository: AuthUserRepository)
                   println(s"Fail to save by $failed") // TODO Loggerに変更する
                   Left(UnknownApplicationError)
                 },
-                created => Right(created)
+                created => Right(created.getId)
               )
         }
     }
   }
   override def authenticate(
       c: UserAuthenticationCommand
-  ): Either[AuthApplicationError, AuthUser] = {
+  ): Either[AuthApplicationError, AuthUserId] = {
     c match {
       case UserAuthenticationCommand.AuthenticateEmailPasswordUser(
             email,
@@ -48,7 +48,7 @@ class AuthService(implicit authUserRepository: AuthUserRepository)
             user match {
               case AuthUser.EmailPasswordAuthUser(_, _, hashedPassword) =>
                 if (AuthUserPassword(password).verify(hashedPassword)) {
-                  Right(user)
+                  Right(user.getId)
                 } else {
                   println(s"Password is invalid") // TODO Loggerに変更する
                   Left(WrongPassword)

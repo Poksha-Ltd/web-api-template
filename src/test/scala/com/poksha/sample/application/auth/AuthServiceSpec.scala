@@ -59,7 +59,7 @@ class AuthServiceSpec
           val actual =
             sut.create(CreatePasswordUser(email, password))
 
-          actual.value shouldBe authedUser
+          actual.value shouldBe authedUser.getId
         }
       }
     }
@@ -79,7 +79,7 @@ class AuthServiceSpec
           val actual =
             sut.authenticate(AuthenticateEmailPasswordUser(email, password))
 
-          actual.value shouldBe authedUser
+          actual.value shouldBe authedUser.getId
         }
       }
 

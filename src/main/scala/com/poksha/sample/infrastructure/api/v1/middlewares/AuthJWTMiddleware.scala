@@ -18,21 +18,22 @@ import scala.concurrent.duration.DurationInt
 
 class AuthJWTMiddleware(implicit authUserRepository: AuthUserRepository) {
   private val algo = JwtAlgorithm.HS256
-  private val privateKey = "privateKey"  // TODO: move to config
+  private val privateKey = "privateKey" // TODO: move to config
 
-  def generateToken(user: AuthUser): String = {
+  def generateToken(userId: AuthUserId): String = {
     val claim = JwtClaim(
       expiration = Some(System.currentTimeMillis + 30.minutes.toMillis),
       issuedAt = Some(System.currentTimeMillis),
-      content = user.getId.asJson.toString
+      content = userId.asJson.toString
     )
     JwtCirce.encode(claim, privateKey, algo)
   }
 
   private val auth: Kleisli[IO, Request[IO], Either[String, AuthUser]] =
-    Kleisli{  request =>
+    Kleisli { request =>
       val token = request.headers.get[Authorization] match {
-        case Some(Authorization(Credentials.Token(AuthScheme.Bearer, token))) => Some(token)
+        case Some(Authorization(Credentials.Token(AuthScheme.Bearer, token))) =>
+          Some(token)
         case _ => None
       }
       val claim = token match {
@@ -44,17 +45,20 @@ class AuthJWTMiddleware(implicit authUserRepository: AuthUserRepository) {
             .leftMap(_ => "Invalid token")
       }
 
-      claim.flatMap { claim =>
-        parser
-          .parse(claim.content)
-          .flatMap(_.as[AuthUserId])
-          .leftMap(_ => "Invalid token")
-          .map(authUserRepository.find)
-          .flatMap(_.toRight("User not found"))
-      }.pure[IO]
+      claim
+        .flatMap { claim =>
+          parser
+            .parse(claim.content)
+            .flatMap(_.as[AuthUserId])
+            .leftMap(_ => "Invalid token")
+            .map(authUserRepository.find)
+            .flatMap(_.toRight("User not found"))
+        }
+        .pure[IO]
 
-  }
-  private val onFailure: AuthedRoutes[String, IO] = Kleisli(req => OptionT.liftF(Forbidden(req.context)))
+    }
+  private val onFailure: AuthedRoutes[String, IO] =
+    Kleisli(req => OptionT.liftF(Forbidden(req.context)))
 
   val middleware: AuthMiddleware[IO, AuthUser] = AuthMiddleware(auth, onFailure)
 

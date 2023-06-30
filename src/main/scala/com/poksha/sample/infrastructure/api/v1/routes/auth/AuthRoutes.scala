@@ -20,47 +20,35 @@ import org.http4s.dsl.io._
 
 class AuthRoutes(
     authService: AuthServiceInterface,
-    authJWTMiddleware: AuthJWTMiddleware
+    authJWT: AuthJWTMiddleware
 )(implicit authUserRepository: AuthUserRepository)
     extends AuthResponseCreator {
   private val publicRoutes: HttpRoutes[IO] = HttpRoutes.of[IO] {
     case req @ POST -> Root / "auth" / "signIn" / "emailPassword" =>
       req
         .as[AuthenticateEmailPasswordUser]
-        .flatMap(c =>
-          authService
-            .authenticate(c)
-            .fold(
-              err => ng(ViewError.fromApplicationError(err)),
-              user =>
-                ok(
-                  AuthUserView(
-                    user,
-                    Token(authJWTMiddleware.generateToken(user))
-                  )
-                )
-            )
-        )
+        .map(authService.authenticate(_))
+        .flatMap { res =>
+          res.fold(
+            err => ng(ViewError.fromApplicationError(err)),
+            userId =>
+              ok(AuthUserView(userId, Token(authJWT.generateToken(userId))))
+          )
+        }
 
     case req @ POST -> Root / "auth" / "signUp" / "emailPassword" =>
       req
         .as[CreatePasswordUser]
-        .flatMap { c =>
-          authService
-            .create(c)
-            .fold(
-              err => ng(ViewError.fromApplicationError(err)),
-              user =>
-                ok(
-                  AuthUserView(
-                    user,
-                    Token(authJWTMiddleware.generateToken(user))
-                  )
-                )
-            )
+        .map(authService.create(_))
+        .flatMap { res =>
+          res.fold(
+            err => ng(ViewError.fromApplicationError(err)),
+            userId =>
+              ok(AuthUserView(userId, Token(authJWT.generateToken(userId))))
+          )
         }
   }
 
   val routes: HttpRoutes[IO] =
-    publicRoutes <+> new EmailPasswordAuthRoutes(authJWTMiddleware).routes
+    publicRoutes <+> new EmailPasswordAuthRoutes(authJWT).routes
 }

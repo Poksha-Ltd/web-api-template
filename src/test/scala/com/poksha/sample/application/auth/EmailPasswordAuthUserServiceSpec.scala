@@ -51,7 +51,7 @@ class EmailPasswordAuthUserServiceSpec
             UpdateAuthPasswordCommand(user.id.toString, updatePassword)
           )
 
-          actual.value shouldBe expected
+          actual.value shouldBe expected.id
         }
       }
     }

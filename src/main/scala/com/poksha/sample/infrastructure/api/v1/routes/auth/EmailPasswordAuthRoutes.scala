@@ -17,7 +17,7 @@ import org.http4s.circe.CirceEntityDecoder._
 import org.http4s.dsl.io._
 import org.http4s.{AuthedRoutes, HttpRoutes}
 
-class EmailPasswordAuthRoutes(authJWTMiddleware: AuthJWTMiddleware)(implicit
+class EmailPasswordAuthRoutes(authJWT: AuthJWTMiddleware)(implicit
     authUserRepository: AuthUserRepository
 ) extends AuthResponseCreator {
   private val protectedRoutes: AuthedRoutes[AuthUser, IO] = AuthedRoutes.of {
@@ -31,17 +31,11 @@ class EmailPasswordAuthRoutes(authJWTMiddleware: AuthJWTMiddleware)(implicit
             .updatePassword(com)
             .fold(
               err => ng(ViewError.fromApplicationError(err)),
-              user =>
-                ok(
-                  AuthUserView(
-                    user,
-                    Token(authJWTMiddleware.generateToken(user))
-                  )
-                )
+              id => ok(AuthUserView(id, Token(authJWT.generateToken(id))))
             )
         }
       }
   }
 
-  val routes: HttpRoutes[IO] = authJWTMiddleware.middleware(protectedRoutes)
+  val routes: HttpRoutes[IO] = authJWT.middleware(protectedRoutes)
 }
