@@ -1,5 +1,6 @@
 package com.poksha.sample.application.auth
 
+import com.poksha.sample.application.auth.AuthApplicationError._
 import com.poksha.sample.domain.auth.{
   AuthUser,
   AuthUserId,
@@ -9,11 +10,13 @@ import com.poksha.sample.domain.auth.{
 
 class AuthService(implicit authUserRepository: AuthUserRepository)
     extends AuthServiceInterface {
-  override def create(c: CreateAuthUserCommand): Either[String, AuthUser] = {
+  override def create(
+      c: CreateAuthUserCommand
+  ): Either[AuthApplicationError, AuthUser] = {
     c match {
       case CreateAuthUserCommand.CreatePasswordUser(email, password) =>
         authUserRepository.findByEmail(email) match {
-          case Some(_) => Left("User already exists")
+          case Some(_) => Left(UserAlreadyExists)
           case None =>
             val user = AuthUser.EmailPasswordAuthUser(
               AuthUserId.generate(),
@@ -23,7 +26,10 @@ class AuthService(implicit authUserRepository: AuthUserRepository)
             authUserRepository
               .save(user)
               .fold(
-                failed => throw new RuntimeException(failed),
+                failed => {
+                  println(s"Fail to save by $failed") // TODO Loggerに変更する
+                  Left(UnknownApplicationError)
+                },
                 created => Right(created)
               )
         }
@@ -31,7 +37,7 @@ class AuthService(implicit authUserRepository: AuthUserRepository)
   }
   override def authenticate(
       c: UserAuthenticationCommand
-  ): Either[String, AuthUser] = {
+  ): Either[AuthApplicationError, AuthUser] = {
     c match {
       case UserAuthenticationCommand.AuthenticateEmailPasswordUser(
             email,
@@ -44,10 +50,11 @@ class AuthService(implicit authUserRepository: AuthUserRepository)
                 if (AuthUserPassword(password).verify(hashedPassword)) {
                   Right(user)
                 } else {
-                  Left("Invalid password")
+                  println(s"Password is invalid") // TODO Loggerに変更する
+                  Left(WrongPassword)
                 }
             }
-          case None => Left("User not found")
+          case None => Left(UserNotFound)
         }
     }
   }
