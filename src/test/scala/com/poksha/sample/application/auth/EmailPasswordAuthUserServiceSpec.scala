@@ -12,59 +12,48 @@ class EmailPasswordAuthUserServiceSpec
     with should.Matchers
     with AuthServiceSpecBase
     with EitherValues {
-  "updatePassword" - {
-    "when the user email is already registered" - {
-      "and save to storage is failed" - {
-        "should return unknown error" in {
+  "updatePassword パスワードの更新" - {
+    "登録済みユーザーのパスワード更新に成功する" - {
+      "対象のユーザーIDが登録済みの場合" - {
+        "パスワードが更新されたユーザーのIDを返す" in {
           val user = dummyAuthedUser()
           val updatePassword = "updated"
+          val expected = user.copy(hashedPassword = AuthUserPassword(updatePassword).hash())
           implicit val authUserRepository: AuthUserRepository =
-            mockAuthUserRepository(
-              findF = _ => Some(user),
-              saveF = _ => Left("saveF error")
-            )
+            mockAuthUserRepository(findF = _ => Some(user), saveF = _ => Right(expected))
           val sut = new EmailPasswordAuthUserService
 
-          val actual = sut.updatePassword(
-            UpdateAuthPasswordCommand(user.id.toString, updatePassword)
-          )
-
-          actual shouldBe Left(UnknownApplicationError)
-        }
-      }
-
-      "and save to storage is succeeded" - {
-        "should return updated user" in {
-          val user = dummyAuthedUser()
-          val updatePassword = "updated"
-          val expected =
-            user.copy(hashedPassword = AuthUserPassword(updatePassword).hash())
-          implicit val authUserRepository: AuthUserRepository =
-            mockAuthUserRepository(
-              findF = _ => Some(user),
-              saveF = _ => Right(expected)
-            )
-          val sut = new EmailPasswordAuthUserService
-
-          val actual = sut.updatePassword(
-            UpdateAuthPasswordCommand(user.id.toString, updatePassword)
-          )
+          val actual = sut.updatePassword(UpdateAuthPasswordCommand(user.id.toString, updatePassword))
 
           actual.value shouldBe expected.id
         }
       }
     }
 
-    "when the user email is not registered" - {
-      "should return user not found error" in {
-        implicit val authUserRepository: AuthUserRepository =
-          mockAuthUserRepository(findF = _ => None)
-        val sut = new EmailPasswordAuthUserService
+    "登録済みユーザーのパスワード更新に失敗する" - {
+      "データベースへの保存処理が失敗した場合" - {
+        "不明のエラーを返す" in {
+          val user = dummyAuthedUser()
+          val updatePassword = "updated"
+          implicit val authUserRepository: AuthUserRepository =
+            mockAuthUserRepository(findF = _ => Some(user), saveF = _ => Left("saveF error"))
+          val sut = new EmailPasswordAuthUserService
 
-        val actual =
-          sut.updatePassword(UpdateAuthPasswordCommand(dummyId, dummyPass))
+          val actual = sut.updatePassword(UpdateAuthPasswordCommand(user.id.toString, updatePassword))
 
-        actual shouldBe Left(UserNotFound)
+          actual shouldBe Left(UnknownApplicationError)
+        }
+      }
+
+      "対象のユーザーIDが登録されていない場合" - {
+        "ユーザーが登録されていないエラーを返す" in {
+          implicit val authUserRepository: AuthUserRepository = mockAuthUserRepository(findF = _ => None)
+          val sut = new EmailPasswordAuthUserService
+
+          val actual = sut.updatePassword(UpdateAuthPasswordCommand(dummyId, dummyPass))
+
+          actual shouldBe Left(UserNotFound)
+        }
       }
     }
   }
