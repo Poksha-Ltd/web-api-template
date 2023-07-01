@@ -5,11 +5,7 @@ import com.poksha.sample.application.auth.EmailPasswordAuthUserServiceCommand.Up
 import com.poksha.sample.application.auth.EmailPasswordAuthUserService
 import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserRepository}
 import com.poksha.sample.infrastructure.api.v1.middlewares.AuthJWTMiddleware
-import com.poksha.sample.infrastructure.api.v1.models.{
-  AuthUserView,
-  Token,
-  ViewError
-}
+import com.poksha.sample.infrastructure.api.v1.models.{AuthUserView, Token, ViewError}
 import io.circe.generic.auto._
 import org.http4s.circe.CirceEntityDecoder._
 import org.http4s.dsl.io._

@@ -1,15 +1,8 @@
 package com.poksha.sample.infrastructure.api.v1.routes.auth
 
 import cats.effect._
-import com.poksha.sample.infrastructure.api.v1.models.ResponseView.{
-  FailureView,
-  SuccessView
-}
-import com.poksha.sample.infrastructure.api.v1.models.{
-  AuthUserView,
-  ViewError,
-  ViewErrorResponseStatus
-}
+import com.poksha.sample.infrastructure.api.v1.models.ResponseView.{FailureView, SuccessView}
+import com.poksha.sample.infrastructure.api.v1.models.{AuthUserView, ViewError, ViewErrorResponseStatus}
 import io.circe.generic.auto._
 import org.http4s.Response
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
@@ -31,15 +24,12 @@ trait AuthResponseCreator {
       .pipe { case (status, view) => toFailureResponse(status, view) }
   }
 
-  private def toFailureStatusAndView(
-      err: ViewError
-  ): (ViewErrorResponseStatus, FailureView) = (err.status, FailureView(err))
+  private def toFailureStatusAndView(err: ViewError): (ViewErrorResponseStatus, FailureView) =
+    (err.status, FailureView(err))
 
-  private def toFailureResponse(
-      status: ViewErrorResponseStatus,
-      view: FailureView
-  ): IO[Response[IO]] = status match {
-    case ViewErrorResponseStatus.BadRequest => BadRequest(view)
-    case ViewErrorResponseStatus.Forbidden  => Forbidden(view)
-  }
+  private def toFailureResponse(status: ViewErrorResponseStatus, view: FailureView): IO[Response[IO]] =
+    status match {
+      case ViewErrorResponseStatus.BadRequest => BadRequest(view)
+      case ViewErrorResponseStatus.Forbidden  => Forbidden(view)
+    }
 }
