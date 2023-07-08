@@ -1,5 +1,5 @@
 # ベースイメージ
-FROM migrate/migrate
+FROM migrate/migrate:v4.16.2
 
 # migration に使う file をコンテナ内の migrations ファイルへ保持する
 RUN mkdir -p /migrations

@@ -17,6 +17,8 @@ on:
 env:
   POSTGRES_CACHE_PATH: postgres-image
   POSTGRES_VERSION: 15-alpine
+  MIGRATE_CACHE_PATH: migrate-image
+  MIGRATE_VERSION: v4.16.2
 
 jobs:
   deploy:
@@ -38,6 +40,19 @@ jobs:
         run: |
           docker pull postgres:${{ env.POSTGRES_VERSION }} 
           docker save postgres:${{ env.POSTGRES_VERSION }} -o ${{ env.POSTGRES_CACHE_PATH }}
+
+      - name: Cache a migrate Docker image
+        id: cache-migrate
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.MIGRATE_CACHE_PATH }}
+          key: ${{ runner.os }}-migrate-${{ env.MIGRATE_VERSION }}
+
+      - name: Pull and save a migrate Docker image
+        if: steps.cache-migrate.outputs.cache-hit != 'true'
+        run: |
+          docker pull migrate/migrate:${{ env.MIGRATE_VERSION }} 
+          docker save migrate/migrate:${{ env.MIGRATE_VERSION }} -o ${{ env.MIGRATE_CACHE_PATH }}
 
       - name: Load docker iamge
         run: docker load -i ${{ env.POSTGRES_CACHE_PATH }}
