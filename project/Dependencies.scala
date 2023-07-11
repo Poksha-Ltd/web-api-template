@@ -7,6 +7,10 @@ object Dependencies {
     lazy val lib = "org.slf4j" % "slf4j-api" % "2.0.7"
   }
 
+  object Logstash {
+    lazy val lib = "net.logstash.logback" % "logstash-logback-encoder" % "7.4"
+  }
+
   object Logback {
     lazy val lib = "ch.qos.logback" % "logback-classic" % "1.4.7"
   }

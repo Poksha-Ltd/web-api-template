@@ -1,0 +1,43 @@
+<configuration>
+
+    <!-- properties -->
+    <define name="LOG_DIR" class="com.poksha.sample.infrastructure.log.TypeSafeConfigLoggingDirPropertyLoader">
+        <loggingDirProperty>application.logging.dir</loggingDirProperty>
+    </define>
+    <define name="LOG_LEVEL" class="com.poksha.sample.infrastructure.log.TypeSafeConfigLoggingLevelPropertyLoader">
+        <loggingLevelProperty>application.logging.level</loggingLevelProperty>
+    </define>
+
+    <!-- 標準出力用の設定 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- ワンライナーのログ出力設定 -->
+        <!--        <encoder>-->
+        <!--            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level]: %logger{36} - %msg%n</pattern>-->
+        <!--        </encoder>-->
+        <!-- JSON形式で出力するエンコーダー -->
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- JSONを見やすく整形してくれる設定 標準出力だけ見やすくしておく -->
+            <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+        </encoder>
+    </appender>
+
+    <!-- ローテーション用の設定 -->
+    <appender name="FILE_BY_DATE_ROTATION" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 動作確認のため、1分ごとにローテーションし、5ファイルだけを保持する設定 -->
+            <fileNamePattern>${LOG_DIR}/web_%d{yyyy-MM-dd_HH-mm}.log</fileNamePattern>
+            <maxHistory>5</maxHistory>
+            <!-- 1日ごとにローテーションし、14ファイルを保持する設定 -->
+            <!--            <fileNamePattern>${LOG_DIR}/web_%d{yyyy-MM-dd}.log</fileNamePattern> -->
+            <!--            <maxHistory>14</maxHistory>-->
+        </rollingPolicy>
+        <!-- JSON形式で出力するエンコーダー -->
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <root level="${LOG_LEVEL}">
+        <!-- 出力対象とするログ設定 -->
+        <appender-ref ref="CONSOLE" />
+<!--        <appender-ref ref="FILE_BY_DATE_ROTATION" />-->
+    </root>
+</configuration>

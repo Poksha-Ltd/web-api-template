@@ -16,6 +16,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       BCrypt.lib,
       Slf4j.lib,
+      Logstash.lib,
       Logback.lib,
       JwtScala.lib,
       TypesafeConfig.lib,
