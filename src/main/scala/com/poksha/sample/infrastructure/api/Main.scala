@@ -2,7 +2,7 @@ package com.poksha.sample.infrastructure.api
 
 import cats.effect._
 import com.comcast.ip4s._
-import com.poksha.sample.application.auth.AuthService
+import com.poksha.sample.application.auth.AuthServiceImpl
 import com.poksha.sample.domain.auth.AuthUserRepository
 import com.poksha.sample.infrastructure.api.v1.routes.V1Routes
 import com.poksha.sample.infrastructure.database.postgres.{
@@ -36,7 +36,7 @@ object Main extends IOApp {
   implicit val authUserRepository: AuthUserRepository =
     AuthUserRepositoryPostgres(dbConfig)
 
-  val authService = new AuthService
+  val authService = new AuthServiceImpl
   private val v1Routes = V1Routes.routes(authService)
   private val httpApp = Router("/" -> rootService, "/v1" -> v1Routes).orNotFound
   def run(args: List[String]): IO[ExitCode] =
