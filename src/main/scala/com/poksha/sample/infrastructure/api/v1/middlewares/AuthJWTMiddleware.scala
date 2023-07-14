@@ -7,7 +7,6 @@ import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserRepository}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.parser
-import io.circe.generic.auto._
 import org.http4s._
 import org.http4s.dsl.io._
 import org.http4s.headers.Authorization
@@ -16,17 +15,19 @@ import pdi.jwt._
 
 import scala.concurrent.duration.DurationInt
 
+case class JwtToken(accessToken: String, tokenType: String = "bearer")
+
 class AuthJWTMiddleware(implicit authUserRepository: AuthUserRepository) {
   private val algo = JwtAlgorithm.HS256
   private val privateKey = "privateKey" // TODO: move to config
 
-  def generateToken(userId: AuthUserId): String = {
+  def generateToken(userId: AuthUserId): JwtToken = {
     val claim = JwtClaim(
       expiration = Some(System.currentTimeMillis + 30.minutes.toMillis),
       issuedAt = Some(System.currentTimeMillis),
       content = userId.asJson.toString
     )
-    JwtCirce.encode(claim, privateKey, algo)
+    JwtToken(JwtCirce.encode(claim, privateKey, algo))
   }
 
   private val auth: Kleisli[IO, Request[IO], Either[String, AuthUser]] =
