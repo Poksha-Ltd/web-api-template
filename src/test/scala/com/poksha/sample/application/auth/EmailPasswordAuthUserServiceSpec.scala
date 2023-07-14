@@ -23,7 +23,7 @@ class EmailPasswordAuthUserServiceSpec
             mockAuthUserRepository(findF = _ => Some(user), saveF = _ => Right(expected))
           val sut = new EmailPasswordAuthUserService
 
-          val actual = sut.updatePassword(UpdateAuthPasswordCommand(user.id.toString, updatePassword))
+          val actual = sut.updatePassword(UpdateAuthPasswordCommand(user.id.value, updatePassword))
 
           actual.value shouldBe expected.id
         }
@@ -39,7 +39,7 @@ class EmailPasswordAuthUserServiceSpec
             mockAuthUserRepository(findF = _ => Some(user), saveF = _ => Left("saveF error"))
           val sut = new EmailPasswordAuthUserService
 
-          val actual = sut.updatePassword(UpdateAuthPasswordCommand(user.id.toString, updatePassword))
+          val actual = sut.updatePassword(UpdateAuthPasswordCommand(user.id.value, updatePassword))
 
           actual shouldBe Left(UnknownApplicationError)
         }

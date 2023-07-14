@@ -1,33 +1,38 @@
 package com.poksha.sample.infrastructure.api.v1.routes.auth
 
 import cats.effect._
-import com.poksha.sample.application.auth.EmailPasswordAuthUserServiceCommand.UpdateAuthPasswordCommand
 import com.poksha.sample.application.auth.EmailPasswordAuthUserService
-import com.poksha.sample.domain.auth.{AuthUser, AuthUserId, AuthUserRepository}
+import com.poksha.sample.domain.auth.{AuthUser, AuthUserRepository}
 import com.poksha.sample.infrastructure.api.v1.middlewares.AuthJWTMiddleware
-import com.poksha.sample.infrastructure.api.v1.models.{AuthUserView, Token, ViewError}
-import io.circe.generic.auto._
-import org.http4s.circe.CirceEntityDecoder._
+import com.poksha.sample.infrastructure.api.v1.models.AuthedUserInput.UpdateUserPasswordInput
+import com.poksha.sample.infrastructure.api.v1.models.{AuthUserView, ViewError}
+import io.circe.generic.decoding.DerivedDecoder.deriveDecoder
+import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.dsl.io._
 import org.http4s.{AuthedRoutes, HttpRoutes}
 
 class EmailPasswordAuthRoutes(authJWT: AuthJWTMiddleware)(implicit
     authUserRepository: AuthUserRepository
 ) extends AuthResponseCreator {
+  private val emailPasswordAuthUserService = new EmailPasswordAuthUserService()
+
   private val protectedRoutes: AuthedRoutes[AuthUser, IO] = AuthedRoutes.of {
     case req @ PATCH -> Root / "auth" / "users" / userId / "password" as user =>
-      val authUserId = AuthUserId.fromString(userId)
-      if (user.getId != authUserId) {
+      if (user.idAsString != userId) {
         ng(ViewError.IdentificationFailed)
       } else {
-        req.req.as[UpdateAuthPasswordCommand].flatMap { com =>
-          new EmailPasswordAuthUserService()
-            .updatePassword(com)
-            .fold(
-              err => ng(ViewError.fromApplicationError(err)),
-              id => ok(AuthUserView(id, Token(authJWT.generateToken(id))))
-            )
-        }
+        req.req
+          .as[UpdateUserPasswordInput]
+          .map { input =>
+            for {
+              com <- input.toCommand
+              id <- emailPasswordAuthUserService.updatePassword(com).left.map(ViewError.fromApplicationError)
+            } yield id
+          }
+          .flatMap {
+            case Left(viewError) => ng(viewError)
+            case Right(userId)   => ok(AuthUserView(userId, authJWT.generateToken(userId)))
+          }
       }
   }
 

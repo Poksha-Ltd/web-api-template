@@ -13,11 +13,11 @@ sealed class ViewError(
 )
 object ViewError {
 
-  // Error in view layer
+  // Error occurred in infrastructure layer
   case object IdentificationFailed extends ViewError(101, "You can only change your own password", Forbidden)
   case object IllegalInputError extends ViewError(102, "You should confirm request arguments", BadRequest)
 
-  // Error in app layer
+  // Error occurred in app layer
   case object AlreadyRegistered extends ViewError(201, "User already exists", BadRequest)
   case object AuthenticationFailed extends ViewError(202, "Authentication failed", BadRequest)
   case object UserNotFound extends ViewError(203, "User not found", BadRequest)

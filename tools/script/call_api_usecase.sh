@@ -41,3 +41,7 @@ echo 'signIn success!!!'
 echo "===check updating password is forbidden when url user id does not match payload user id==="
 DUMMY_ID="da868be4-83d2-4ad8-9150-10b946631953"
 curl -s -i -X PATCH -H "Content-Type: application/json" -H "Authorization: Bearer $UPDATED_TOKEN" localhost:8080/v1/auth/users/$DUMMY_ID/password -d "{\"id\": \"$USER_ID\",\"password\": \"9999\"}" | head -n 1
+
+
+echo "===check updating password is bad request when user id is invalid format==="
+curl -s -X PATCH -H "Content-Type: application/json" -H "Authorization: Bearer $UPDATED_TOKEN" localhost:8080/v1/auth/users/$USER_ID/password -d "{\"id\": \"invalid_id_format\",\"password\": \"9999\"}" | jq
