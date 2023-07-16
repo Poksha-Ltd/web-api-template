@@ -2,10 +2,12 @@ package com.poksha.sample.infrastructure.database.postgres
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import doobie.implicits.toSqlInterpolator
-import doobie.util.transactor.Transactor
+import com.typesafe.config.ConfigFactory
 import doobie.implicits._
+import doobie.util.transactor.Transactor
 import org.slf4j.LoggerFactory
+
+import scala.util.chaining.scalaUtilChainingOps
 
 trait RepositoryPostgresTestBase {
   private[this] val logger = LoggerFactory.getLogger(getClass)
@@ -13,11 +15,15 @@ trait RepositoryPostgresTestBase {
   // テストではテスト用のDBを使用します
   val testDataBase: String = "test_authentication"
 
-  val testConfig: PostgresConfig = PostgresConfig(
-    url = s"jdbc:postgresql:$testDataBase",
-    user = "postgres",
-    pass = "password"
-  )
+  val testConfig: PostgresConfig = ConfigFactory
+    .load()
+    .pipe(config =>
+      PostgresConfig(
+        url = config.getString("database.postgres.url"),
+        user = config.getString("database.postgres.user"),
+        pass = config.getString("database.postgres.pass")
+      )
+    )
 
   private val testTransActor = Transactor.fromDriverManager[IO](
     driver = testConfig.driver,

@@ -9,12 +9,24 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_URL=jdbc:postgresql:authentication
+      - DB_URL=jdbc:postgresql://db:5432/authentication
       - DB_USER=postgres
       - DB_PASSWORD=password
     depends_on:
       - db
-    profiles: ["app"]
+  test_web:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev
+    volumes:
+      - .:/app
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/test_authentication
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+    depends_on:
+      - db
+    profiles: ["test"]
   db:
     image: postgres:15-alpine
     ports:
@@ -25,7 +37,6 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=authentication
-    profiles: ["database"]
   db_migrate:
     build:
       context: ./docker/migrate
@@ -33,5 +44,7 @@ services:
     depends_on:
       - db
     # docker composeで起動時は開発用途なので migrate up で良い、運用時は command の arguments を調整することで down や up 1 などで何を適用するか決定する
-    command: ["-database", "postgres://postgres:password@db:5432/authentication?sslmode=disable", "-path", "/migrations/", "up"]
-    profiles: ["database"]
+    profiles: ["tool"]
+    tty: true
+    volumes:
+      - ./docker/migrate/version:/migrations

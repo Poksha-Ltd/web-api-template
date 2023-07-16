@@ -2,5 +2,9 @@
 FROM migrate/migrate:v4.16.2
 
 # migration に使う file をコンテナ内の migrations ファイルへ保持する
-RUN mkdir -p /migrations
-ADD ./version/* /migrations
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
+ADD entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
