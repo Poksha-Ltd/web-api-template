@@ -22,19 +22,19 @@ dev/ps:
 dev/logs/web:
 	docker compose -f docker-compose.dev.yml logs -f web
 
-dev/migrate:
+dev/db/migrate:
 	docker compose -f docker-compose.dev.yml run --rm -e DATABASE_URL=$(DATABASE_URL) db_migrate
 
 dev/db/reset:
 	docker compose -f docker-compose.dev.yml run --rm -e DATABASE_URL=$(DATABASE_URL) db_migrate drop -f
 
-dev/test/migrate:
+test/migrate:
 	docker compose -f docker-compose.dev.yml run --rm -e DATABASE_URL=$(TEST_DATABASE_URL) db_migrate
 
-dev/test/run:
+test/run:
 	docker compose -f docker-compose.dev.yml run --rm test_web sbt test
 
-dev/test/clean:
+test/clean:
 	docker compose -f docker-compose.dev.yml run --rm -e DATABASE_URL=$(TEST_DATABASE_URL) db_migrate drop -f
 
-dev/test: dev/test/migrate dev/test/run dev/test/clean
+test: test/migrate test/run test/clean
