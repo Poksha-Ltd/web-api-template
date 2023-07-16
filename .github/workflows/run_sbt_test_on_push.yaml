@@ -54,21 +54,9 @@ jobs:
           docker pull migrate/migrate:${{ env.MIGRATE_VERSION }} 
           docker save migrate/migrate:${{ env.MIGRATE_VERSION }} -o ${{ env.MIGRATE_CACHE_PATH }}
 
-      - name: Load docker iamge
+      - name: Load docker image
         run: docker load -i ${{ env.POSTGRES_CACHE_PATH }}
-      
-      - name: Start database by docker compose up
-        run: |
-          docker compose -f docker-compose.dev.yml --profile database up -d
 
-      - name: Set up java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-          cache: 'sbt'
-
-      - name: Run sbt test 
-        id: run-sbt-test
+      - name: run test
         run: |
-          sbt test
+          make test
