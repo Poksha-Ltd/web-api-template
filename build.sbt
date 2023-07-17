@@ -19,7 +19,8 @@ lazy val root = (project in file("."))
       Logback.lib,
       JwtScala.lib,
       TypesafeConfig.lib,
-      ScalaTest.lib
+      ScalaTest.lib,
+      TestContainers.PostgreSQL.lib
     ) ++ Circe.libs
       ++ Doobie.libs
       ++ Http4s.libs
