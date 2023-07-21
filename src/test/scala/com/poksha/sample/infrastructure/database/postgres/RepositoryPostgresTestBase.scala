@@ -77,7 +77,7 @@ object RepositoryPostgresTestBase {
   final val ImageTag = "postgres:15-alpine"
   final val Username = "postgres"
   final val Password = "password"
-  final val DatabaseName = "test_authentication"
+  final val DatabaseName = "authentication"
 
   final val migrationFilePaths: List[String] = {
     val migrationFileDir = new File("docker/migrate/version")
