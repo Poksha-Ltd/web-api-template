@@ -60,4 +60,10 @@ object Dependencies {
   object ScalaTest {
     lazy val lib = "org.scalatest" %% "scalatest" % "3.2.16" % "test"
   }
+
+  object TestContainers {
+    object PostgreSQL {
+      lazy val lib = "org.testcontainers" % "postgresql" % "1.18.3" % Test
+    }
+  }
 }

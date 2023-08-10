@@ -12,7 +12,15 @@ class AuthUserRepositoryPostgresSpec
     with RepositoryPostgresTestBase
     with BeforeAndAfterAll {
 
-  override def afterAll(): Unit = clearTestData()
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    setUp()
+  }
+
+  override def afterAll(): Unit = {
+    super.afterAll()
+    cleanUp()
+  }
 
   "AuthUserRepositoryPostgres" should "save new user with email" in {
     val sut = AuthUserRepositoryPostgres(testConfig)
