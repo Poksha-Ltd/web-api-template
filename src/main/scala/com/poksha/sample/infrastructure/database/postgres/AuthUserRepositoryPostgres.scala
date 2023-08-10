@@ -9,17 +9,18 @@ import doobie.implicits._
 import com.poksha.sample.domain.auth.AuthUser.EmailPasswordAuthUser
 import org.slf4j.LoggerFactory
 
+import java.util.UUID
+
 case class AuthUserDataModel(
     id: String,
     email: String,
     hashedPassword: String
 ) {
   def toDomain: EmailPasswordAuthUser =
-    EmailPasswordAuthUser(id, email, hashedPassword)
+    EmailPasswordAuthUser.of(UUID.fromString(id), email, hashedPassword)
 }
 
-case class AuthUserRepositoryPostgres(config: PostgresConfig)
-    extends AuthUserRepository {
+case class AuthUserRepositoryPostgres(config: PostgresConfig) extends AuthUserRepository {
 
   private val logger = LoggerFactory.getLogger(this.getClass.getName)
 
