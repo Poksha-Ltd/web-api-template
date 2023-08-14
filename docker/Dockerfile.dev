@@ -22,4 +22,4 @@ RUN sbt -V
 EXPOSE 8080
 
 # アプリケーションを実行
-CMD ["sbt", "run"]
+CMD ["sbt", "~reStart"]
