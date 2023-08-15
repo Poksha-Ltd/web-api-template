@@ -10,7 +10,7 @@ Scalaとhttp4sを使ったWEB APIのテンプレートです。
 make dev/setup
 ```
 
-statusがhealthyになったら、http://localhost:8000/ にアクセス
+statusがhealthyになったら、http://localhost:8080/ にアクセス
 
 ```bash
 make dev/ps
