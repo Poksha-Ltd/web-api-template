@@ -71,4 +71,4 @@ jobs:
       - name: Run sbt test 
         id: run-sbt-test
         run: |
-          sbt test
+          sudo sbt test
