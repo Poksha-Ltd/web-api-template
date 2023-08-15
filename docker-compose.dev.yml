@@ -13,6 +13,8 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=password
       - PORT=8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
     depends_on:
       - db
   db:
@@ -23,6 +25,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=authentication
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
     volumes:
       - db_data:/var/lib/postgresql/data
   db_migrate:
